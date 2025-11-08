@@ -19,7 +19,7 @@ dependencies:
   flutter_inset_box_shadow: ^1.0.7
   get: ^4.6.1
   shared_preferences: ^2.0.13
-  file_picker: ^10.3.2
+  file_picker: ^10.3.3
   # flutter_mobile_vision: ^0.1.4+1
   flutter_native_splash: ^2.0.1+1
   flutter_launcher_icons: ^0.14.4
