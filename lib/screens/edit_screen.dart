@@ -26,7 +26,6 @@ class _EditScreenState extends State<EditScreen> {
     positionedit.text = (widget.st.lastindex + 1).toString();
     index = widget.st.lastindex;
     alltext = widget.st.wholetext;
-    // headeredit.text = widget.st.title;
     super.initState();
   }
 
@@ -186,7 +185,6 @@ class _EditScreenState extends State<EditScreen> {
     final updatedtext = widget.st.copy(
       wholetext: newlasttext,
       lastindex: newlastindex,
-      // title: newheader,
     );
     await TextsDatabase.instance.update(updatedtext);
   }

@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:freeder_new/controllers/state_controller.dart';
 import 'package:freeder_new/models/saved_text_model.dart';
-import 'package:freeder_new/screens/reader_screen.dart';
 import 'package:freeder_new/screens/settings_screen.dart';
 import 'package:get/get.dart';
 
@@ -33,11 +32,8 @@ void main() {
     });
 
     test('Speed map provides correct reading delays', () {
-      // Test for short words
       expect(controller.speedsMap[200]?['short'], 250);
-      // Test for medium words
       expect(controller.speedsMap[200]?['medium'], 300);
-      // Test for long words
       expect(controller.speedsMap[200]?['long'], 400);
     });
   });
@@ -121,8 +117,8 @@ void main() {
     testWidgets('Settings screen initializes correctly', (WidgetTester tester) async {
       // Build material app with settings screen
       await tester.pumpWidget(
-        GetMaterialApp(
-          home: const SettingsScreen(),
+        const GetMaterialApp(
+          home: SettingsScreen(),
         ),
       );
       await tester.pumpAndSettle();
@@ -133,7 +129,7 @@ void main() {
       
       // Verify text size limits are shown
       expect(find.text('25 < '), findsOneWidget);
-      expect(find.text(' > 75 '), findsOneWidget);
+      expect(find.text(' > 75'), findsOneWidget);
       
       // Verify that speed buttons are present
       expect(find.widgetWithText(ElevatedButton, '100'), findsOneWidget);

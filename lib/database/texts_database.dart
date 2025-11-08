@@ -1,8 +1,10 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:freeder_new/models/saved_text_model.dart';
+import 'package:freeder_new/utils/logger.dart';
 
 class TextsDatabase {
   static final TextsDatabase instance = TextsDatabase._init();
+  final log = getLogger('TextsDatabase');
 
   static Database? _database;
 
@@ -16,6 +18,7 @@ class TextsDatabase {
   }
 
   Future<Database> _initDB(String filepath) async {
+    log.info('Initializing database: $filepath');
     final dbpath = await getDatabasesPath();
     final path = dbpath + filepath;
     return await openDatabase(path, version: 1, onCreate: createDB);
@@ -36,23 +39,29 @@ class TextsDatabase {
   }
 
   Future<SavedText> create(SavedText st) async {
+    log.info('Creating new saved text: ${st.title}');
     final db = await instance.database;
     final id = await db.insert(tableTexts, st.toJson());
+    log.info('Created text with ID: $id');
     return st.copy(id: id);
   }
 
   Future<SavedText?> readText(int id) async {
+    log.fine('Reading text with ID: $id');
     final db = await instance.database;
     final maps = await db.query(tableTexts, columns: SavedTextFields.values, where: '${SavedTextFields.id} = ?', whereArgs: [id]);
     if (maps.isNotEmpty) {
+      log.fine('Found text with ID: $id');
       return SavedText.fromJson(maps.first);
     } else {
+      log.warning('Text not found with ID: $id');
       return null;
     }
   }
 
   Future<int> update(SavedText st) async {
     final db = await instance.database;
+    log.info('Updating text with ID: ${st.id}: "${st.title}" - ${st.wholetext.length} characters');
     return db.update(
       tableTexts,
       st.toJson(),
@@ -62,12 +71,15 @@ class TextsDatabase {
   }
 
   Future<int> delete(int id) async {
+    log.info('Deleting text with ID: $id');
     final db = await instance.database;
-    return await db.delete(
+    final result = await db.delete(
       tableTexts,
       where: '${SavedTextFields.id} = ?',
       whereArgs: [id],
     );
+    log.info('Delete result: $result rows affected');
+    return result;
   }
 
   Future<List<SavedText>> readAllSavedTexts() async {

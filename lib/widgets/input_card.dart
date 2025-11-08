@@ -4,12 +4,14 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:freeder_new/database/texts_database.dart';
 import 'package:freeder_new/models/saved_text_model.dart';
+import 'package:freeder_new/utils/logger.dart';
 import 'package:freeder_new/screens/reader_screen.dart';
 
 class InputCard extends StatelessWidget {
   final Future<void> Function() func;
   InputCard({super.key, required this.func});
 
+  final log = getLogger('InputCard');
   final TextEditingController editcont = TextEditingController();
 
   @override
@@ -24,57 +26,37 @@ class InputCard extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
-                  style: const TextStyle(
-                    color: Colors.white,
-                  ),
+                  style: const TextStyle(color: Colors.white),
                   decoration: const InputDecoration(
-                      hintText: 'ваш текст...',
-                      hintStyle: TextStyle(color: Colors.white38),
-                      border: UnderlineInputBorder(
-                          borderSide: BorderSide(
-                        color: Color.fromARGB(255, 17, 35, 49),
-                      ))),
+                    hintText: 'ваш текст...',
+                    hintStyle: TextStyle(color: Colors.white38),
+                    border: UnderlineInputBorder(borderSide: BorderSide(color: Color.fromARGB(255, 17, 35, 49))),
+                  ),
                   // enabled: false,
                   controller: editcont,
                   maxLines: 20,
                   minLines: 1,
                 ),
               ),
-              const SizedBox(
-                height: 8,
-              ),
+              const SizedBox(height: 8),
               TextButton.icon(
                 onPressed: () async {
                   if (editcont.text.isNotEmpty) {
-                    int id = await addText(editcont.text);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ReaderScreen(
-                          textid: id,
-                        ),
-                      ),
-                    ).whenComplete(func);
+                    log.info('Adding new text from input (length: ${editcont.text.length} chars)');
+                    final navigator = Navigator.of(context);
+                    final id = await addText(editcont.text);
+                    log.info('Text saved with ID: $id, navigating to reader');
+                    navigator.push(MaterialPageRoute(builder: (context) => ReaderScreen(textid: id))).whenComplete(func);
                   }
                   editcont.clear();
                 },
-                icon: const Icon(
-                  Icons.textsms,
-                  color: Colors.white,
-                ),
-                label: const Text(
-                  'читать',
-                  style: TextStyle(
-                    color: Colors.white,
-                  ),
-                ),
-              )
+                icon: const Icon(Icons.textsms, color: Colors.white),
+                label: const Text('читать', style: TextStyle(color: Colors.white)),
+              ),
             ],
           ),
         ),
-        const SizedBox(
-          height: 10,
-        ),
+        const SizedBox(height: 10),
         Card(
           color: const Color.fromARGB(255, 28, 57, 78),
           child: SizedBox(
@@ -83,7 +65,9 @@ class InputCard extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: TextButton.icon(
                 onPressed: () async {
-                  var result = await FilePicker.platform.pickFiles(
+                  final navigator = Navigator.of(context);
+                  log.info('Opening file picker for text files');
+                  final result = await FilePicker.platform.pickFiles(
                     type: FileType.custom,
                     allowedExtensions: [
                       'txt',
@@ -91,30 +75,19 @@ class InputCard extends StatelessWidget {
                       // 'docx',
                     ],
                   );
-                  if (result == null) return;
-                  File file = File(result.files.single.path!);
-                  String content = await file.readAsString();
+                  if (result == null) {
+                    log.info('File picking cancelled');
+                    return;
+                  }
+                  final file = File(result.files.single.path!);
+                  log.info('Reading file: ${result.files.single.name}');
+                  final content = await file.readAsString();
                   // print(content);
-                  int id = await addText(content);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ReaderScreen(
-                        textid: id,
-                      ),
-                    ),
-                  ).whenComplete(func);
+                  final id = await addText(content);
+                  navigator.push(MaterialPageRoute(builder: (context) => ReaderScreen(textid: id))).whenComplete(func);
                 },
-                icon: const Icon(
-                  Icons.add,
-                  color: Colors.white,
-                ),
-                label: const Text(
-                  'выбрать файл',
-                  style: TextStyle(
-                    color: Colors.white,
-                  ),
-                ),
+                icon: const Icon(Icons.add, color: Colors.white),
+                label: const Text('выбрать файл', style: TextStyle(color: Colors.white)),
               ),
             ),
           ),
@@ -124,13 +97,10 @@ class InputCard extends StatelessWidget {
   }
 
   Future<int> addText(String wholetext) async {
-    final ttext = SavedText(
-      title: '',
-      wholetext: wholetext,
-      lastindex: 0,
-      timecreated: DateTime.now(),
-    );
-    var a = await TextsDatabase.instance.create(ttext);
+    log.info('Creating new SavedText entry with ${wholetext.length} characters');
+    final ttext = SavedText(title: '', wholetext: wholetext, lastindex: 0, timecreated: DateTime.now());
+    final a = await TextsDatabase.instance.create(ttext);
+    log.info('Successfully created text with ID: ${a.id}');
     return a.id!;
   }
 }

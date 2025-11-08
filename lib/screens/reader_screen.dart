@@ -6,6 +6,7 @@ import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:freeder_new/controllers/state_controller.dart';
 import 'package:freeder_new/database/texts_database.dart';
 import 'package:freeder_new/models/saved_text_model.dart';
+import 'package:freeder_new/utils/logger.dart';
 import 'package:freeder_new/screens/settings_screen.dart';
 import 'package:freeder_new/widgets/bottom_panel.dart';
 
@@ -22,6 +23,7 @@ class ReaderScreen extends StatefulWidget {
 }
 
 class _ReaderScreenState extends State<ReaderScreen> with SingleTickerProviderStateMixin {
+  final log = getLogger('ReaderScreen');
   late AnimationController animcontroller;
   late PanelController pcontroller;
   List<String> textlist = [
@@ -41,6 +43,7 @@ class _ReaderScreenState extends State<ReaderScreen> with SingleTickerProviderSt
 
   @override
   void initState() {
+    log.info('Initializing reader screen for text ID: ${widget.textid}');
     refreshText().whenComplete(() {
       setState(() {
         counter = thissavedtext!.lastindex;
@@ -48,6 +51,7 @@ class _ReaderScreenState extends State<ReaderScreen> with SingleTickerProviderSt
         textlist.add('//конец//');
         textlist.removeWhere((element) => element == '█');
         lastText = textlist.sublist(0, counter).join(' ');
+        log.info('Text loaded with ${textlist.length} words, starting at word $counter');
       });
     });
     dur = Duration(milliseconds: controller.speedsMap[controller.getSpeed()]!['short']!);
@@ -69,7 +73,8 @@ class _ReaderScreenState extends State<ReaderScreen> with SingleTickerProviderSt
       animcontroller.reset();
       lastText += ' ${textlist[counter]}';
       counter++;
-      var a = textlist[counter].length;
+      log.fine('Reading word ${counter + 1}/${textlist.length}: "${textlist[counter]}"');
+      final a = textlist[counter].length;
       if (a > 4) {
         dur = Duration(milliseconds: controller.speedsMap[controller.getSpeed()]!['medium']!);
       }
@@ -86,8 +91,10 @@ class _ReaderScreenState extends State<ReaderScreen> with SingleTickerProviderSt
 
   void textpauser() {
     if (!ispaused) {
+      log.info('Pausing reader at word $counter');
       animcontroller.stop();
     } else {
+      log.info('Resuming reader from word $counter');
       animcontroller.forward();
       pcontroller.close();
     }

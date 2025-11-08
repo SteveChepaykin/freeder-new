@@ -2,13 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:freeder_new/controllers/state_controller.dart';
 import 'package:freeder_new/screens/texts_screen.dart';
+import 'package:freeder_new/utils/logger.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Initialize app logging
+  setupLogging();
+  final log = getLogger('main');
+  log.info('Starting app');
   // var stcont = StateController();
-  // Get.put<StateController>(stcont);
   Get.putAsync<StateController>(() async {
-    var c = StateController();
+    final c = StateController();
     await c.init();
     return c;
   },);

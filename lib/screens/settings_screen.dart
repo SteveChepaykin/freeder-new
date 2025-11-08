@@ -15,7 +15,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   void initState() {
-    var a = Get.find<StateController>();
+    final a = Get.find<StateController>();
     cont.text = a.getSize().toString();
     spd = a.getSpeed()!;
     super.initState();
@@ -45,7 +45,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
-                    "25 < ",
+                    '25 < ',
                     style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
                   SizedBox(
@@ -61,7 +61,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                   const Text(
-                    " > 75 ",
+                    ' > 75',
                     style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
                 ],
@@ -97,7 +97,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               TextButton.icon(
                 onPressed: () {
                   if (int.parse(cont.text) > 25 && int.parse(cont.text) < 75) {
-                    var a = Get.find<StateController>();
+                    final a = Get.find<StateController>();
                     // a.changeFontSize(int.parse(cont.text));
                     a.setSize(int.parse(cont.text));
                     // a.changeSpeed(spd);
