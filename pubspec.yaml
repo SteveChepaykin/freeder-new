@@ -17,7 +17,7 @@ dependencies:
   sqflite: ^2.0.2
   intl: ^0.20.2
   flutter_inset_box_shadow: ^1.0.7
-  get: ^4.6.1
+  get: ^4.7.3
   shared_preferences: ^2.0.13
   file_picker: ^10.3.2
   # flutter_mobile_vision: ^0.1.4+1
